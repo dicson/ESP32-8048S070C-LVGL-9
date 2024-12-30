@@ -9,5 +9,8 @@ PlatformIO
 LVGL 9.2.2  
 TAMC_GT911 1.0.2  
 
+# How to use?
+Just clone or download this repo and open the folder ESP32-8048S070C-LVGL-9-main with PlatformIO
+
 # Screenshot
 ![IMG20241230110834(1)](https://github.com/user-attachments/assets/1f680a9a-5f0a-4f3b-81db-6ae69ed318a4)
