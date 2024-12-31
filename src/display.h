@@ -2,7 +2,7 @@
 #define DISPLAY_H
 
 #include <lvgl.h>
-#include <driver/Arduino_GFX_Library.h>
+#include <Arduino_GFX_Library.h>
 #include "TAMC_GT911.h" /* 1.0.2 */
 
 // Configuration for Display and Touch
@@ -21,22 +21,16 @@ TAMC_GT911 ts(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST
 
 #define GFX_BL 2
 
-// Setup display
-Arduino_ESP32RGBPanel *bus = new Arduino_ESP32RGBPanel(
-    GFX_NOT_DEFINED /* CS */, GFX_NOT_DEFINED /* SCK */, GFX_NOT_DEFINED /* SDA */,
+Arduino_ESP32RGBPanel rgbpanel(
     41 /* DE */, 40 /* VSYNC */, 39 /* HSYNC */, 42 /* PCLK */,
     14 /* R0 */, 21 /* R1 */, 47 /* R2 */, 48 /* R3 */, 45 /* R4 */,
     9 /* G0 */, 46 /* G1 */, 3 /* G2 */, 8 /* G3 */, 16 /* G4 */, 1 /* G5 */,
-    15 /* B0 */, 7 /* B1 */, 6 /* B2 */, 5 /* B3 */, 4 /* B4 */
-);
+    15 /* B0 */, 7 /* B1 */, 6 /* B2 */, 5 /* B3 */, 4 /* B4 */,
+    0 /* hsync_polarity */, 20 /* hsync_front_porch */, 30 /* hsync_pulse_width */, 16 /* hsync_back_porch */,
+    0 /* vsync_polarity */, 22 /* vsync_front_porch */, 13 /* vsync_pulse_width */, 10 /* vsync_back_porch */,
+    true /* pclk_active_neg */);
 
-Arduino_RPi_DPI_RGBPanel *gfx = new Arduino_RPi_DPI_RGBPanel(
-    bus,
-    800 /* width */, 0 /* hsync_polarity */, 210 /* hsync_front_porch */, 30 /* hsync_pulse_width */, 16 /* hsync_back_porch */,
-    480 /* height */, 0 /* vsync_polarity */, 22 /* vsync_front_porch */, 13 /* vsync_pulse_width */, 10 /* vsync_back_porch */,
-    1 /* pclk_active_neg */, 16000000 /* prefer_speed */, true /* auto_flush */
-);
-
+Arduino_RGB_Display gfx(800, 480, &rgbpanel, 0, true);
 
 uint32_t screenWidth;
 uint32_t screenHeight;
@@ -54,7 +48,7 @@ void my_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 #ifndef DIRECT_MODE
   uint32_t w = lv_area_get_width(area);
   uint32_t h = lv_area_get_height(area);
-  gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)px_map, w, h);
+  gfx.draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)px_map, w, h);
 #endif
   lv_disp_flush_ready(disp);
 }
@@ -86,10 +80,10 @@ void setup_display()
   Serial.begin(115200);
   Serial.println("Initializing display...");
 
-  gfx->begin();
+  gfx.begin();
 
 
-  gfx->fillScreen(0x000000);
+  gfx.fillScreen(0x000000);
 
 #ifdef GFX_BL
   pinMode(GFX_BL, OUTPUT);
@@ -102,8 +96,8 @@ void setup_display()
   lv_init();
   lv_tick_set_cb(millis_cb);
 
-  screenWidth = gfx->width();
-  screenHeight = gfx->height();
+  screenWidth = gfx.width();
+  screenHeight = gfx.height();
 #ifdef DIRECT_MODE
   bufSize = screenWidth * screenHeight;
 #else
@@ -131,7 +125,7 @@ void setup_display()
 void loop_display()
 {
   lv_task_handler();
-  delay(5);
+  delay(1000);
 }
 
 
