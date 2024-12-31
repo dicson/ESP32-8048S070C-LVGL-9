@@ -1,8 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <lvgl.h>
-#include <Arduino_GFX_Library.h>
+#include <lvgl.h> /* 9.2.2 */
+#include <Arduino_GFX_Library.h> /* 1.5.0 */
 #include "TAMC_GT911.h" /* 1.0.2 */
 
 // Configuration for Display and Touch
@@ -125,7 +125,7 @@ void setup_display()
 void loop_display()
 {
   lv_task_handler();
-  delay(1000);
+  delay(5);
 }
 
 
