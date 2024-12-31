@@ -16,7 +16,7 @@ Just clone or download this repo and open the folder ESP32-8048S070C-LVGL-9-main
 # Resolving the Build Error
 
 When you first compile the project, you may encounter the following error:  
-.pio/libdeps/esp32s3box/lvgl/src/lv_conf_internal.h:60:18: fatal error: ../../lv_conf.h: No such file or directory
+`.pio/libdeps/esp32s3box/lvgl/src/lv_conf_internal.h:60:18: fatal error: ../../lv_conf.h: No such file or directory`
 
 #### How to Fix
 
@@ -26,7 +26,7 @@ When you first compile the project, you may encounter the following error:
 4. Rename the copied file to `lv_conf.h`.
 
 After completing these steps, you should have the file located at:  
-
+`.pio/libdeps/esp32s3box/lv_conf.h`  
 
 
 # Screenshot
