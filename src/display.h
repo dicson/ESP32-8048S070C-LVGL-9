@@ -96,6 +96,7 @@ void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
 void setup_display()
 {
   Serial.begin(115200);
+  delay(500); // Short delay to ensure serial is ready
   Serial.println("Initializing display...");
 
   gfx.begin();
