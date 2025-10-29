@@ -19,25 +19,11 @@
 // Initialize touchscreen object
 TAMC_GT911 ts(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST, max(TOUCH_MAP_X1, TOUCH_MAP_X2), max(TOUCH_MAP_Y1, TOUCH_MAP_Y2));
 
+int32_t GFX_BL_VALUE = 200; // brightness
+uint32_t GFX_BL_TIME = 10000;
+
 #define GFX_BL 2
-#ifdef GFX_BL
 #include <driver/ledc.h>
-ledc_channel_config_t ledc_channel = {
-    .gpio_num = GFX_BL,
-    .speed_mode = LEDC_LOW_SPEED_MODE,
-    .channel = LEDC_CHANNEL_2,
-    .timer_sel = LEDC_TIMER_0,
-    .duty = 200,
-    .hpoint = 0,
-};
-ledc_timer_config_t ledc_timer = {
-    .speed_mode = LEDC_LOW_SPEED_MODE,   // timer mode
-    .duty_resolution = LEDC_TIMER_8_BIT, // resolution of PWM duty
-    .timer_num = LEDC_TIMER_0,           // timer index
-    .freq_hz = 1000,                     // frequency of PWM signal
-    .clk_cfg = LEDC_USE_RTC8M_CLK,       // Force source clock to RTC8M
-};
-#endif
 
 Arduino_ESP32RGBPanel rgbpanel(
     41 /* DE */, 40 /* VSYNC */, 39 /* HSYNC */, 42 /* PCLK */,
@@ -86,6 +72,11 @@ void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
         data->point.y = ts.points[i].y; // Get y coordinate
       }
     }
+    if (ledcRead(GFX_BL) == 0)
+    {
+      ledcWrite(GFX_BL, GFX_BL_VALUE);
+      lv_indev_wait_release(indev);
+    }
   }
   else
   {
@@ -103,12 +94,8 @@ void setup_display()
 
   gfx.fillScreen(0x000000);
 
-#ifdef GFX_BL
-  ledc_timer_config(&ledc_timer);
-  ledc_channel_config(&ledc_channel);
-  ledc_set_duty(ledc_channel.speed_mode, ledc_channel.channel, ledc_channel.duty);
-  ledc_update_duty(ledc_channel.speed_mode, ledc_channel.channel);
-#endif
+  ledcAttach(GFX_BL, 1000, LEDC_TIMER_8_BIT);
+  ledcWrite(GFX_BL, GFX_BL_VALUE); /* Screen brightness can be modified by adjusting this parameter. (0-255) */
 
   ts.begin(); // Initialize the touchscreen
   ts.setRotation(1);
@@ -146,6 +133,10 @@ void loop_display()
 {
   lv_task_handler();
   delay(5);
+  if ((lv_display_get_inactive_time(disp) > GFX_BL_TIME) && (ledcRead(GFX_BL) != 0))
+  {
+    ledcWrite(GFX_BL, 0);
+  }
 }
 
 #endif // DISPLAY_H
